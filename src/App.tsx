@@ -12,11 +12,15 @@ import { useYcursor } from './hooks/useYcursor';
 const App = () => {
   const { ydoc } = useYdoc();
   const yRootMap = ydoc.getMap('root');
-  const undoManager = new Y.UndoManager(yRootMap);
+  const undoManager = new Y.UndoManager(yRootMap, {
+    trackedOrigins: new Set(['move-rect']),
+  });
 
   const stageRef = useRef<Konva.Stage>(null);
-  const { rects, dragStartCanvas, dragMove, dragEndCanvas } =
-    useYcanvas(yRootMap);
+  const { rects, dragStartCanvas, dragMove, dragEndCanvas } = useYcanvas(
+    yRootMap,
+    undoManager
+  );
   const { cursors, moveCursor } = useYcursor(yRootMap, stageRef.current);
 
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) =>
@@ -72,7 +76,6 @@ const App = () => {
             height={rect.height}
             width={rect.width}
             fill="#89b717"
-            opacity={rect.isDragging ? 0.5 : 1}
             draggable
             shadowColor="black"
             onDragStart={handleDragStart}

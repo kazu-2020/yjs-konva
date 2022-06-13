@@ -45,7 +45,7 @@ export const useYcanvas = (yRootMap: Y.Map<unknown>) => {
       )
       yRects.delete(0, yRects.length)
       yRects.push(newRects)
-    })
+    }, 'move-rect')
   , []);
 
   const dragEndCanvas = useCallback((target: Shape) =>
@@ -56,7 +56,7 @@ export const useYcanvas = (yRootMap: Y.Map<unknown>) => {
       )
       yRects.delete(0, yRects.length)
       yRects.push(newRects)
-    })
+    }, 'move-rect')
   , []);
 
   const hasChangeRects = (event: Y.YEvent<any>) => event.path.join() === 'rects'
