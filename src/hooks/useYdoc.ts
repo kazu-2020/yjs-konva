@@ -8,9 +8,8 @@ export const useYdoc = () => {
 
   useEffect(() => {
     if (isFirstLoad.current) {
-      isFirstLoad.current = false;
-    } else {
       new WebrtcProvider('konva', ydoc);
+      isFirstLoad.current = false;
     }
   }, [ydoc]);
 
