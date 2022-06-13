@@ -17,10 +17,8 @@ const App = () => {
   });
 
   const stageRef = useRef<Konva.Stage>(null);
-  const { rects, dragStartCanvas, dragMove, dragEndCanvas } = useYcanvas(
-    yRootMap,
-    undoManager
-  );
+  const { rects, dragStartCanvas, dragMove, dragEndCanvas } =
+    useYcanvas(yRootMap);
   const { cursors, moveCursor } = useYcursor(yRootMap, stageRef.current);
 
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) =>

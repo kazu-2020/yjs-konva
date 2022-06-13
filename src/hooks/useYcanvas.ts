@@ -8,7 +8,6 @@ type Rect = {
   y: number;
   height: number;
   width: number;
-  isDragging: boolean;
 };
 
 const generateShapes = (): Rect[] =>
@@ -18,7 +17,6 @@ const generateShapes = (): Rect[] =>
     y: Math.random() * window.innerHeight,
     height: 50,
     width: 50,
-    isDragging: false,
   }));
 
 const INITIAL_STATE = generateShapes();
@@ -37,27 +35,20 @@ export const useYcanvas = (yRootMap: Y.Map<unknown>) => {
     );
   }, []);
 
-  const dragMove = useCallback((target: Shape) =>
+  const updateYRect = (target: Shape) => {
     ydoc?.transact(() => {
       const yRects = yRootMap.get('rects') as Y.Array<Rect>
       const newRects = yRects.map((rect) =>
-        rect.id === target.id() ? { ...rect, x: target.x(), y: target.y(), isDragging: true } : rect
+        rect.id === target.id() ? { ...rect, x: target.x(), y: target.y()} : rect
       )
       yRects.delete(0, yRects.length)
       yRects.push(newRects)
     }, 'move-rect')
-  , []);
+  }
 
-  const dragEndCanvas = useCallback((target: Shape) =>
-    ydoc?.transact(() => {
-      const yRects = yRootMap.get('rects') as Y.Array<Rect>
-      const newRects = yRects.map((rect) =>
-        rect.id === target.id() ? { ...rect, x: target.x(), y: target.y(), isDragging: false } : rect
-      )
-      yRects.delete(0, yRects.length)
-      yRects.push(newRects)
-    }, 'move-rect')
-  , []);
+  const dragMove = useCallback(updateYRect, []);
+
+  const dragEndCanvas = useCallback(updateYRect, []);
 
   const hasChangeRects = (event: Y.YEvent<any>) => event.path.join() === 'rects'
 
