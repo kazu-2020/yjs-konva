@@ -2,21 +2,36 @@ import { useRef, useEffect } from 'react';
 import './App.css';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { useYcanvas } from './useYcanvas';
+import { useYcanvas } from './hooks/useYcanvas';
 import { Shape } from 'konva/lib/Shape';
 import Konva from 'konva';
+import * as Y from 'yjs';
+import { useYdoc } from './hooks/useYdoc';
 
 const App = () => {
+  const { ydoc } = useYdoc();
+  const yRootMap = ydoc.getMap('root');
+  const undoManager = new Y.UndoManager(yRootMap);
+
   const stageRef = useRef<Konva.Stage>(null);
-  const { rects, dragStartCanvas, dragEndCanvas, undo, redo } = useYcanvas();
+  const { rects, dragStartCanvas, dragMove, dragEndCanvas } =
+    useYcanvas(yRootMap);
 
   const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
     if (e.target instanceof Shape) dragStartCanvas(e.target);
   };
 
+  const handleDragMove = (e: KonvaEventObject<DragEvent>) => {
+    if (e.target instanceof Shape) dragMove(e.target);
+  };
+
   const handleDragEnd = (e: KonvaEventObject<DragEvent>) => {
     if (e.target instanceof Shape) dragEndCanvas(e.target);
   };
+
+  const undo = () => undoManager.undo();
+
+  const redo = () => undoManager.redo();
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'z' && e.metaKey) {
@@ -49,6 +64,7 @@ const App = () => {
             shadowColor="black"
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
+            onDragMove={handleDragMove}
           />
         ))}
       </Layer>
