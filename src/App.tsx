@@ -27,7 +27,10 @@ const App = () => {
   };
 
   const handleDragMove = (e: KonvaEventObject<DragEvent>) => {
-    if (e.target instanceof Shape) dragMove(e.target);
+    if (e.target instanceof Shape) {
+      moveCursor(e.evt.x, e.evt.y);
+      dragMove(e.target);
+    }
   };
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent>) => {
