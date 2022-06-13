@@ -29,23 +29,25 @@ export const useYcursor = (
     });
   }, []);
 
-  yRootMap?.observeDeep((events) => {
-      events.forEach((event) => {
-        if (event.target instanceof Y.Array<Cursor>) {
-          const yCursors = event.target
-          const cursors = yCursors.toArray()
+  const hasChangeCursors = (event: Y.YEvent<any>) => event.path.join() === 'cursors'
 
-          ydoc?.transact(() => {
-          const uniqueIds = new Set();
-            for (let i = cursors.length - 1; i >= 0; i--) {
-              const item = cursors[i];
-              uniqueIds.has(item.id) ? yCursors.delete(i, 1) : uniqueIds.add(item.id);
-            }
-          })
+  yRootMap?.observeDeep((events) => {
+    events.forEach((event) => {
+      if ((event.target instanceof Y.Array<Cursor>) && hasChangeCursors(event)) {
+        const yCursors = event.target
+        const cursors = yCursors.toArray()
+
+        ydoc?.transact(() => {
+        const uniqueIds = new Set();
+          for (let i = cursors.length - 1; i >= 0; i--) {
+            const item = cursors[i];
+            uniqueIds.has(item.id) ? yCursors.delete(i, 1) : uniqueIds.add(item.id);
+          }
+        })
 
         setCursors(yCursors.toArray().filter((cursor) => cursor.id !== current.id));
-        }
-      })
+      }
+    })
   });
 
   useEffect(() => {
