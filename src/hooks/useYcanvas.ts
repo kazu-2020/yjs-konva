@@ -63,8 +63,11 @@ export const useYcanvas = (yRootMap: Y.Map<unknown>) => {
   }, []);
 
   yRootMap.observe((event, _) => {
-    const yRects = event.target.get('rects') as YArray<Rect>;
-    setRects(yRects.toArray());
+    const yRects = event.target.get('rects')
+
+    if (yRects instanceof Y.Array<Rect>) {
+      setRects(yRects.toArray());
+    }
   });
 
   return { rects, dragStartCanvas, dragMove, dragEndCanvas } as const;
