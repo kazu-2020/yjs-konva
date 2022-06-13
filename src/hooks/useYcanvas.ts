@@ -12,12 +12,12 @@ type Rect = {
 };
 
 const generateShapes = (): Rect[] =>
-  [...Array(1)].map((_, i) => ({
+  [...Array(100)].map((_, i) => ({
     id: i.toString(),
-    x: 300,
-    y: 300,
-    height: 300,
-    width: 300,
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    height: 50,
+    width: 50,
     isDragging: false,
   }));
 
@@ -37,44 +37,44 @@ export const useYcanvas = (yRootMap: Y.Map<unknown>) => {
     );
   }, []);
 
-  const updateYRects = (rects: Rect[]) => {
-    const yRects = yRootMap.get('rects') as Y.Array<Rect>
-    yRects.delete(0, yRects.length)
-    yRects.push(rects)
-  }
-
-  const dragMove = useCallback((target: Shape) => {
+  const dragMove = useCallback((target: Shape) =>
     ydoc?.transact(() => {
-      const newArray = [...rects].map((obj) =>
-        obj.id === target.id() ? { ...obj, x: target.x(), y: target.y() } : obj
-      );
-      updateYRects(newArray)
-    });
-  }, []);
+      const yRects = yRootMap.get('rects') as Y.Array<Rect>
+      const newRects = yRects.map((rect) =>
+        rect.id === target.id() ? { ...rect, x: target.x(), y: target.y(), isDragging: true } : rect
+      )
+      yRects.delete(0, yRects.length)
+      yRects.push(newRects)
+    })
+  , []);
 
-  const dragEndCanvas = useCallback((target: Shape) => {
+  const dragEndCanvas = useCallback((target: Shape) =>
     ydoc?.transact(() => {
-      const newArray = [...rects].map((obj) =>
-        obj.id === target.id()
-          ? { ...obj, x: target.x(), y: target.y(), isDragging: false }
-          : obj
-      );
-      updateYRects(newArray)
-    });
-  }, []);
+      const yRects = yRootMap.get('rects') as Y.Array<Rect>
+      const newRects = yRects.map((rect) =>
+        rect.id === target.id() ? { ...rect, x: target.x(), y: target.y(), isDragging: false } : rect
+      )
+      yRects.delete(0, yRects.length)
+      yRects.push(newRects)
+    })
+  , []);
 
   const hasChangeRects = (event: Y.YEvent<any>) => event.path.join() === 'rects'
 
   yRootMap.observeDeep((events) => {
     events.forEach((event) => {
       if ((event.target instanceof Y.Array<Rect>) && hasChangeRects(event)) {
+
         setRects(event.target.toArray());
       }
     })
   });
 
   useEffect(() => {
-    yRootMap.set('rects', new Y.Array<Rect>());
+    const yRects = new Y.Array<Rect>();
+
+    yRootMap.set('rects', yRects);
+    yRects.push(INITIAL_STATE)
   }, [yRootMap]);
 
   return { rects, dragStartCanvas, dragMove, dragEndCanvas } as const;
