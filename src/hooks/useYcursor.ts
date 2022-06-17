@@ -17,7 +17,6 @@ const current: Cursor = {
 
 export const useYcursor = (
   yRootMap: Y.Map<unknown>,
-  stage: Konva.Stage | null
 ) => {
   const ydoc = yRootMap.doc;
   const [cursors, setCursors] = useState<Cursor[]>([]);
@@ -25,9 +24,9 @@ export const useYcursor = (
   const moveCursor = useCallback((x: number, y: number) => {
     ydoc?.transact(() => {
       const yCursors = yRootMap.get('cursors') as Y.Array<Cursor>;
-      yCursors.push([{ ...current, x, y }]);
+      yCursors?.push([{ ...current, x, y }]);
     });
-  }, []);
+  }, [yRootMap, ydoc]);
 
   const hasChangeCursors = (event: Y.YEvent<any>) => event.path.join() === 'cursors'
 

@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, memo, useCallback } from 'react';
 import './App.css';
 import { Stage, Layer, Rect, Text, Circle } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
@@ -8,6 +8,12 @@ import Konva from 'konva';
 import * as Y from 'yjs';
 import { useYdoc } from './hooks/useYdoc';
 import { useYcursor } from './hooks/useYcursor';
+
+type RectProps = React.ComponentProps<typeof Rect>;
+type CircleProps = React.ComponentProps<typeof Circle>;
+
+const MemoRect = memo((props: RectProps) => <Rect {...props} />);
+const MemoCircle = memo((props: CircleProps) => <Circle {...props} />);
 
 const App = () => {
   const { ydoc } = useYdoc();
@@ -19,25 +25,34 @@ const App = () => {
   const stageRef = useRef<Konva.Stage>(null);
   const { rects, dragStartCanvas, dragMove, dragEndCanvas } =
     useYcanvas(yRootMap);
-  const { cursors, moveCursor } = useYcursor(yRootMap, stageRef.current);
+  const { cursors, moveCursor } = useYcursor(yRootMap);
 
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) =>
     moveCursor(e.evt.x, e.evt.y);
 
-  const handleDragStart = (e: KonvaEventObject<DragEvent>) => {
-    if (e.target instanceof Shape) dragStartCanvas(e.target);
-  };
+  const handleDragStart = useCallback(
+    (e: KonvaEventObject<DragEvent>) => {
+      if (e.target instanceof Shape) dragStartCanvas(e.target);
+    },
+    [dragStartCanvas]
+  );
 
-  const handleDragMove = (e: KonvaEventObject<DragEvent>) => {
-    if (e.target instanceof Shape) {
-      moveCursor(e.evt.x, e.evt.y);
-      dragMove(e.target);
-    }
-  };
+  const handleDragMove = useCallback(
+    (e: KonvaEventObject<DragEvent>) => {
+      if (e.target instanceof Shape) {
+        moveCursor(e.evt.x, e.evt.y);
+        dragMove(e.target);
+      }
+    },
+    [dragMove, moveCursor]
+  );
 
-  const handleDragEnd = (e: KonvaEventObject<DragEvent>) => {
-    if (e.target instanceof Shape) dragEndCanvas(e.target);
-  };
+  const handleDragEnd = useCallback(
+    (e: KonvaEventObject<DragEvent>) => {
+      if (e.target instanceof Shape) dragEndCanvas(e.target);
+    },
+    [dragEndCanvas]
+  );
 
   const undo = () => undoManager.undo();
 
@@ -66,7 +81,7 @@ const App = () => {
       <Layer>
         <Text text="Try to drag a rect" />
         {rects.map((rect) => (
-          <Rect
+          <MemoRect
             key={rect.id}
             id={rect.id}
             x={rect.x}
@@ -83,7 +98,7 @@ const App = () => {
         ))}
 
         {cursors.map((cursor) => (
-          <Circle
+          <MemoCircle
             key={cursor.id}
             x={cursor.x}
             y={cursor.y}

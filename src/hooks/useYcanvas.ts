@@ -11,10 +11,12 @@ type Rect = {
 };
 
 const generateShapes = (): Rect[] =>
-  [...Array(100)].map((_, i) => ({
+  [...Array(1000)].map((_, i) => ({
     id: i.toString(),
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
+    // x: Math.random() * window.innerWidth,
+    // y: Math.random() * window.innerHeight,
+    x: i * 10,
+    y: i * 10,
     height: 50,
     width: 50,
   }));
@@ -46,16 +48,15 @@ export const useYcanvas = (yRootMap: Y.Map<unknown>) => {
     }, 'move-rect')
   }
 
-  const dragMove = useCallback(updateYRect, []);
+  const dragMove = useCallback(updateYRect, [yRootMap, ydoc]);
 
-  const dragEndCanvas = useCallback(updateYRect, []);
+  const dragEndCanvas = useCallback(updateYRect, [yRootMap, ydoc]);
 
   const hasChangeRects = (event: Y.YEvent<any>) => event.path.join() === 'rects'
 
   yRootMap.observeDeep((events) => {
     events.forEach((event) => {
       if ((event.target instanceof Y.Array<Rect>) && hasChangeRects(event)) {
-
         setRects(event.target.toArray());
       }
     })
