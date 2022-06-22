@@ -19,7 +19,9 @@ export const useYdoc = () => {
         awareness: new awarenessProtocol.Awareness(ydoc),
         maxConns: 20 + Math.floor(Math.random() * 15),
         filterBcConns: true,
-        peerOpts: {},
+        peerOpts: {
+          config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
+        },
       });
 
       provider.on('synced', (synced: any) => {

@@ -8,12 +8,13 @@ import Konva from 'konva';
 import * as Y from 'yjs';
 import { useYdoc } from './hooks/useYdoc';
 import { useYcursor } from './hooks/useYcursor';
+import { Cursor } from './Cursor';
 
 type RectProps = React.ComponentProps<typeof Rect>;
-type CircleProps = React.ComponentProps<typeof Circle>;
+// type CircleProps = React.ComponentProps<typeof Circle>;
 
 const MemoRect = memo((props: RectProps) => <Rect {...props} />);
-const MemoCircle = memo((props: CircleProps) => <Circle {...props} />);
+// const MemoCircle = memo((props: CircleProps) => <Circle {...props} />);
 
 const App = () => {
   const { ydoc } = useYdoc();
@@ -98,13 +99,7 @@ const App = () => {
         ))}
 
         {cursors.map((cursor) => (
-          <MemoCircle
-            key={cursor.id}
-            x={cursor.x}
-            y={cursor.y}
-            radius={5}
-            fill="red"
-          />
+          <Cursor key={cursor.id} x={cursor.x} y={cursor.y} id={cursor.id} />
         ))}
       </Layer>
     </Stage>
