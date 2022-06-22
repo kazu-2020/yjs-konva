@@ -10,7 +10,6 @@ export const useYdoc = () => {
   useEffect(() => {
     if (isFirstLoad.current) {
       const provider = new WebrtcProvider('konva', ydoc, {
-        // signaling: ['wss://webrtc-service-dev-psr3kihlka-an.a.run.app'],
         // signaling: ['ws://localhost:9080'],
         signaling: ['ws://localhost:9080'],
         // signaling: ['ws://localhost:5555'],
